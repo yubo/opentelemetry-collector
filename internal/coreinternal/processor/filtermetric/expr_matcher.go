@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package filtermetric // import "github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal/processor/filtermetric"
+package filtermetric // import "github.com/yubo/opentelemetry-collector/internal/coreinternal/processor/filtermetric"
 
 import (
 	"go.opentelemetry.io/collector/model/pdata"
 
-	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal/processor/filterexpr"
+	"github.com/yubo/opentelemetry-collector/internal/coreinternal/processor/filterexpr"
 )
 
 type exprMatcher struct {

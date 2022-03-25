@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package filterexpr // import "github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal/processor/filterexpr"
+package filterexpr // import "github.com/yubo/opentelemetry-collector/internal/coreinternal/processor/filterexpr"
 
 import (
 	"github.com/antonmedv/expr"

@@ -22,8 +22,8 @@ import (
 	"go.opentelemetry.io/collector/model/pdata"
 	conventions "go.opentelemetry.io/collector/model/semconv/v1.6.1"
 
-	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal/processor/filterconfig"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal/processor/filterset"
+	"github.com/yubo/opentelemetry-collector/internal/coreinternal/processor/filterconfig"
+	"github.com/yubo/opentelemetry-collector/internal/coreinternal/processor/filterset"
 )
 
 func createConfig(matchType filterset.MatchType) *filterset.Config {

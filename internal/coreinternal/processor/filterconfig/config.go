@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package filterconfig // import "github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal/processor/filterconfig"
+package filterconfig // import "github.com/yubo/opentelemetry-collector/internal/coreinternal/processor/filterconfig"
 
 import (
 	"errors"
 
-	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal/processor/filterset"
+	"github.com/yubo/opentelemetry-collector/internal/coreinternal/processor/filterset"
 )
 
 // MatchConfig has two optional MatchProperties one to define what is processed

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package metricstestutil // import "github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal/metricstestutil"
+package metricstestutil // import "github.com/yubo/opentelemetry-collector/internal/coreinternal/metricstestutil"
 
 import (
 	"time"

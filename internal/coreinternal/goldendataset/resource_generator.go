@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package goldendataset // import "github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal/goldendataset"
+package goldendataset // import "github.com/yubo/opentelemetry-collector/internal/coreinternal/goldendataset"
 
 import (
 	"go.opentelemetry.io/collector/model/pdata"

@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package filterlog // import "github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal/processor/filterlog"
+package filterlog // import "github.com/yubo/opentelemetry-collector/internal/coreinternal/processor/filterlog"
 
 import (
 	"fmt"
 
 	"go.opentelemetry.io/collector/model/pdata"
 
-	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal/processor/filterconfig"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal/processor/filtermatcher"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal/processor/filterset"
+	"github.com/yubo/opentelemetry-collector/internal/coreinternal/processor/filterconfig"
+	"github.com/yubo/opentelemetry-collector/internal/coreinternal/processor/filtermatcher"
+	"github.com/yubo/opentelemetry-collector/internal/coreinternal/processor/filterset"
 )
 
 // Matcher is an interface that allows matching a log record against a

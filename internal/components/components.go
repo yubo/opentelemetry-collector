@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package components // import "github.com/open-telemetry/opentelemetry-collector-contrib/internal/components"
+package components // import "github.com/yubo/opentelemetry-collector/internal/components"
 
 import (
 	"go.opentelemetry.io/collector/component"
@@ -141,6 +141,8 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/windowsperfcountersreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/zipkinreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/zookeeperreceiver"
+
+	"github.com/yubo/opentelemetry-collector/processor/geoipprocessor"
 )
 
 func Components() (component.Factories, error) {
@@ -276,6 +278,7 @@ func Components() (component.Factories, error) {
 
 	processors := []component.ProcessorFactory{
 		attributesprocessor.NewFactory(),
+		geoipprocessor.NewFactory(),
 		batchprocessor.NewFactory(),
 		filterprocessor.NewFactory(),
 		groupbyattrsprocessor.NewFactory(),

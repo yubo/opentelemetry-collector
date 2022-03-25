@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package filterset // import "github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal/processor/filterset"
+package filterset // import "github.com/yubo/opentelemetry-collector/internal/coreinternal/processor/filterset"
 
 import (
 	"fmt"
 
-	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal/processor/filterset/regexp"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal/processor/filterset/strict"
+	"github.com/yubo/opentelemetry-collector/internal/coreinternal/processor/filterset/regexp"
+	"github.com/yubo/opentelemetry-collector/internal/coreinternal/processor/filterset/strict"
 )
 
 // MatchType describes the type of pattern matching a FilterSet uses to filter strings.

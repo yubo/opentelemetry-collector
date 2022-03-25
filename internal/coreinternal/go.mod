@@ -1,4 +1,4 @@
-module github.com/open-telemetry/opentelemetry-collector-contrib/internal/coreinternal
+module github.com/yubo/opentelemetry-collector/internal/coreinternal
 
 go 1.17
 
