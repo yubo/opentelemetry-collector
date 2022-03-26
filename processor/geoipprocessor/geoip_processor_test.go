@@ -2,6 +2,7 @@ package geoipprocessor
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,10 +19,8 @@ var (
 	cfg = &Config{
 		ProcessorSettings: config.NewProcessorSettings(config.NewComponentID(typeStr)),
 		Field:             []string{"ip"},
-		DatabaseFile:      "./testdata/GeoLite2-City.mmdb",
+		DatabaseFile:      "./testdata/GeoIP2-City-Test.mmdb",
 		TargetField:       "geoip",
-		IgnoreMissing:     false,
-		FirstOnly:         true,
 		Properties: []string{
 			"continent_name",
 			"country_iso_code",
@@ -30,9 +29,19 @@ var (
 			"region_name",
 			"city_name",
 			"location",
+			"geohash",
 		},
+		HashPrecision: 12,
 	}
 )
+
+func TestMain(m *testing.M) {
+	cfg.Validate()
+
+	exitVal := m.Run()
+
+	os.Exit(exitVal)
+}
 
 func TestGeoipProcessorAttributesUpsert(t *testing.T) {
 	tests := []struct {
@@ -57,11 +66,19 @@ func TestGeoipProcessorAttributesUpsert(t *testing.T) {
 			name:   "config_attributes_applied_on_existing_geoip",
 			config: cfg,
 			sourceAttributes: map[string]pdata.Value{
-				"ip": pdata.NewValueString("1.1.1.1"),
+				"ip": pdata.NewValueString("27.18.198.204"),
 			},
 			wantAttributes: map[string]pdata.Value{
-				"ip":    pdata.NewValueString("1.1.1.1"),
-				"geoip": pdata.NewValueString("1.1.1.1"),
+				"ip":                     pdata.NewValueString("27.18.198.204"),
+				"geoip.continent_name":   pdata.NewValueString("Asia"),
+				"geoip.country_iso_code": pdata.NewValueString("CN"),
+				"geoip.country_name":     pdata.NewValueString("China"),
+				"geoip.region_iso_code":  pdata.NewValueString("HB"),
+				"geoip.region_name":      pdata.NewValueString("Hubei"),
+				"geoip.city_name":        pdata.NewValueString("Wuhan"),
+				"geoip.location.lat":     pdata.NewValueDouble(30.589),
+				"geoip.location.lon":     pdata.NewValueDouble(114.2681),
+				"geoip.geohash":          pdata.NewValueString("wt3q00x3zdyu"),
 			},
 		},
 	}
@@ -79,7 +96,9 @@ func TestGeoipProcessorAttributesUpsert(t *testing.T) {
 
 				// Ensure that the modified `td` has the attributes sorted:
 				sortAttributes(td)
-				require.Equal(t, generateTraceData(tt.wantAttributes), td)
+				require.Equal(t,
+					generateTraceData(tt.wantAttributes).ResourceSpans().At(0),
+					td.ResourceSpans().At(0))
 			}
 
 			// Test metrics consumer
@@ -103,7 +122,7 @@ func TestGeoipProcessorAttributesUpsert(t *testing.T) {
 				assert.NoError(t, tp.ConsumeLogs(context.Background(), ld))
 				// Ensure that the modified `ld` has the attributes sorted:
 				sortLogAttributes(ld)
-				require.Equal(t, generateLogData(tt.wantAttributes), ld)
+				require.EqualValues(t, generateLogData(tt.wantAttributes), ld)
 			}
 		})
 	}

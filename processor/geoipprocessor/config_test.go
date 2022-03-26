@@ -20,13 +20,11 @@ func TestLoadConfig(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, cfg)
 
-	assert.Equal(t, cfg.Processors[config.NewComponentID(typeStr)], &Config{
+	expected := &Config{
 		ProcessorSettings: config.NewProcessorSettings(config.NewComponentID(typeStr)),
 		Field:             []string{"ip"},
-		DatabaseFile:      "./testdata/GeoLite2-City.mmdb",
+		DatabaseFile:      "./testdata/GeoIP2-City-Test.mmdb",
 		TargetField:       "geoip",
-		IgnoreMissing:     false,
-		FirstOnly:         true,
 		Properties: []string{
 			"continent_name",
 			"country_iso_code",
@@ -35,10 +33,12 @@ func TestLoadConfig(t *testing.T) {
 			"region_name",
 			"city_name",
 			"location",
+			"geohash",
 		},
-	})
+		HashPrecision: 3,
+	}
 
-	assert.Equal(t, cfg.Processors[config.NewComponentIDWithName(typeStr, "invalid")], &Config{
-		ProcessorSettings: config.NewProcessorSettings(config.NewComponentIDWithName(typeStr, "invalid")),
-	})
+	expected.Validate()
+
+	assert.Equal(t, cfg.Processors[config.NewComponentID(typeStr)], expected)
 }

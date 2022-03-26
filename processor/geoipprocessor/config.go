@@ -1,6 +1,9 @@
 package geoipprocessor
 
 import (
+	"net"
+
+	"github.com/oschwald/geoip2-golang"
 	"go.opentelemetry.io/collector/config"
 )
 
@@ -15,16 +18,41 @@ type Config struct {
 	// The field that will hold the geographical information looked up from the MaxMind database.
 	TargetField string `mapstructure:"target_field"`
 	// If true and field does not exist, the processor quietly exits without modifying the document
-	IgnoreMissing bool `mapstructure:"ignore_missing"`
+	// IgnoreMissing bool `mapstructure:"ignore_missing"`
 	// If true only first found geoip data will be returned, even if field contains array
-	FirstOnly bool `mapstructure:"first_only"`
+	// FirstOnly bool `mapstructure:"first_only"`
 	// Controls what properties are added to the target_field based on the geoip lookup.
+	// "continent_name", "country_iso_code", "country_name", "city_name", "location", "geohash"
 	Properties []string `mapstructure:"properties"`
+
+	HashPrecision uint `mapstructure:"hash_precision"`
+
+	reader dbReader
 }
+
+type dbReader interface {
+	City(ipAddress net.IP) (*geoip2.City, error)
+}
+
+var (
+	defProperties = []string{"continent_name", "country_iso_code", "country_name", "city_name", "location"}
+	mockDatabase  = "mock-database"
+)
 
 var _ config.Processor = (*Config)(nil)
 
 // Validate checks if the processor configuration is valid
-func (cfg *Config) Validate() error {
+func (cfg *Config) Validate() (err error) {
+	if len(cfg.Properties) == 0 {
+		cfg.Properties = defProperties
+	}
+	if cfg.HashPrecision <= 0 || cfg.HashPrecision > 12 {
+		cfg.HashPrecision = 12
+	}
+
+	if cfg.reader, err = geoip2.Open(cfg.DatabaseFile); err != nil {
+		return err
+	}
+
 	return nil
 }

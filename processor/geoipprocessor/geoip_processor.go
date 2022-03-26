@@ -2,31 +2,84 @@ package geoipprocessor
 
 import (
 	"context"
+	"net"
 
+	"github.com/mmcloughlin/geohash"
 	"go.opentelemetry.io/collector/model/pdata"
 	"go.uber.org/zap"
 
+	"github.com/oschwald/geoip2-golang"
 	"github.com/yubo/opentelemetry-collector/internal/coreinternal/attraction"
 )
 
 type geoipProcessor struct {
-	logger      *zap.Logger
-	attrProc    *attraction.AttrProc
-	fields      []string
-	targetField string
+	logger        *zap.Logger
+	attrProc      *attraction.AttrProc
+	fields        []string
+	targetField   string
+	properties    []string
+	reader        dbReader
+	hashPrecision uint
 }
 
 func (p *geoipProcessor) processAttributes(ctx context.Context, attrs pdata.AttributeMap) bool {
 	for _, field := range p.fields {
 		if av, found := attrs.Get(field); found {
-			// insert
-			// TODO: use geoip.*
-			attrs.Insert(p.targetField, av)
+			record, err := p.reader.City(net.ParseIP(av.StringVal()))
+			if err != nil {
+				p.logger.Debug("reader.City()",
+					zap.String("ip", av.StringVal()),
+					zap.Error(err),
+				)
+				return true
+			}
+
+			p.setAttr(attrs, record)
 			return true
 		}
 	}
 
 	return false
+}
+
+func (p *geoipProcessor) setAttr(attrs pdata.AttributeMap, record *geoip2.City) {
+	for _, v := range p.properties {
+		switch v {
+		case "continent_name":
+			if v, ok := record.Continent.Names["en"]; ok {
+				attrs.Insert(p.targetField+".continent_name", pdata.NewValueString(v))
+			}
+		case "country_iso_code":
+			attrs.Insert(p.targetField+".country_iso_code", pdata.NewValueString(record.Country.IsoCode))
+		case "country_name":
+			if v, ok := record.Country.Names["en"]; ok {
+				attrs.Insert(p.targetField+".country_name", pdata.NewValueString(v))
+			}
+		case "region_iso_code":
+			if len(record.Subdivisions) > 0 {
+				attrs.Insert(p.targetField+".region_iso_code", pdata.NewValueString(record.Subdivisions[0].IsoCode))
+			}
+		case "region_name":
+			if len(record.Subdivisions) > 0 {
+				if v, ok := record.Subdivisions[0].Names["en"]; ok {
+					attrs.Insert(p.targetField+".region_name", pdata.NewValueString(v))
+				}
+			}
+		case "city_name":
+			if v, ok := record.City.Names["en"]; ok {
+				attrs.Insert(p.targetField+".city_name", pdata.NewValueString(v))
+			}
+		case "location":
+			attrs.Insert(p.targetField+".location.lat", pdata.NewValueDouble(record.Location.Latitude))
+			attrs.Insert(p.targetField+".location.lon", pdata.NewValueDouble(record.Location.Longitude))
+		case "geohash":
+			attrs.Insert(p.targetField+".geohash", pdata.NewValueString(geohash.EncodeWithPrecision(
+				record.Location.Latitude,
+				record.Location.Longitude,
+				p.hashPrecision,
+			)))
+		}
+	}
 }
 
 func (p *geoipProcessor) processTraces(ctx context.Context, td pdata.Traces) (pdata.Traces, error) {

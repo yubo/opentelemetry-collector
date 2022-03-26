@@ -32,6 +32,7 @@ func NewFactory() component.ProcessorFactory {
 func createDefaultConfig() config.Processor {
 	return &Config{
 		ProcessorSettings: config.NewProcessorSettings(config.NewComponentID(typeStr)),
+		HashPrecision:     6,
 	}
 }
 
@@ -89,8 +90,11 @@ func createAttrProcessor(cfg *Config, logger *zap.Logger) (*geoipProcessor, erro
 	}
 
 	return &geoipProcessor{
-		logger:      logger,
-		fields:      cfg.Field,
-		targetField: cfg.TargetField,
+		logger:        logger,
+		fields:        cfg.Field,
+		targetField:   cfg.TargetField,
+		properties:    cfg.Properties,
+		reader:        cfg.reader,
+		hashPrecision: cfg.HashPrecision,
 	}, nil
 }

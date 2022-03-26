@@ -23,10 +23,8 @@ func TestCreateProcessor(t *testing.T) {
 	cfg := &Config{
 		ProcessorSettings: config.NewProcessorSettings(config.NewComponentID(typeStr)),
 		Field:             []string{"ip"},
-		DatabaseFile:      "./testdata/GeoLite2-City.mmdb",
+		DatabaseFile:      "./testdata/GeoIP2-City-Test.mmdb",
 		TargetField:       "geoip",
-		IgnoreMissing:     false,
-		FirstOnly:         true,
 		Properties: []string{
 			"continent_name",
 			"country_iso_code",

@@ -8,14 +8,11 @@ processors:
     field:
       - ip
     # The database filename referring to a database the module ships with (GeoLite2-City.mmdb, GeoLite2-Country.mmdb, or GeoLite2-ASN.mmdb) or a custom database in the ingest-geoip config directory.
-    database_file: ./testdata/GeoLite2-City.mmdb
+    database_file: ./testdata/GeoIP2-City-Test.mmdb
     # The field that will hold the geographical information looked up from the MaxMind database.
     target_field: geoip
-    # If true and field does not exist, the processor quietly exits without modifying the document
-    ignore_missing: false
-    # If true only first found geoip data will be returned, even if field contains array
-    first_only: true
     # Controls what properties are added to the target_field based on the geoip lookup.
+    hash_precision: 3
     properties:
       - continent_name
       - country_iso_code
@@ -24,8 +21,7 @@ processors:
       - region_name
       - city_name
       - location
-  geoip/invalid:
-
+      - geohash
 
 exporters:
   nop:
