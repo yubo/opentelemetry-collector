@@ -89,7 +89,7 @@ checklicense:
 .PHONY: fmt
 fmt:
 	gofmt  -w -s ./
-	goimports -w  -local github.com/open-telemetry/opentelemetry-collector-contrib ./
+	goimports -w  -local github.com/yubo/opentelemetry-collector ./
 
 .PHONY: lint
 lint: checklicense impi misspell
@@ -111,7 +111,7 @@ misspell-correction:
 
 .PHONY: impi
 impi:
-	@$(IMPI) --local github.com/open-telemetry/opentelemetry-collector-contrib --scheme stdThirdPartyLocal ./...
+	@$(IMPI) --local github.com/yubo/opentelemetry-collector --scheme stdThirdPartyLocal ./...
 
 .PHONY: moddownload
 moddownload:
