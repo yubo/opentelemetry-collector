@@ -161,6 +161,11 @@ endif
 docker-otelcol:
 	COMPONENT=otelcol $(MAKE) docker-component
 
+.PHONY: docker-push
+docker-push:
+	docker tag otelcol ybbbbasdf/otelcol:latest
+	docker push ybbbbasdf/otelcol:latest
+
 # Build the Collector executable.
 .PHONY: otelcol
 otelcol:
@@ -216,28 +221,6 @@ otel-from-tree:
 	# 3. You can now build contrib and it will use your local otel core changes.
 	# 4. Before committing/pushing your contrib changes, undo by running `make otel-from-lib`.
 	$(MAKE) for-all CMD="$(GOCMD) mod edit -replace go.opentelemetry.io/collector=$(SRC_ROOT)/../opentelemetry-collector"
-
-.PHONY: otel-from-lib
-otel-from-lib:
-	# Sets opentelemetry core to be not be pulled from local source tree. (Undoes otel-from-tree.)
-	$(MAKE) for-all CMD="$(GOCMD) mod edit -dropreplace go.opentelemetry.io/collector"
-
-.PHONY: build-examples
-build-examples:
-	docker-compose -f examples/tracing/docker-compose.yml build
-	docker-compose -f exporter/splunkhecexporter/example/docker-compose.yml build
-
-.PHONY: deb-rpm-package
-%-package: ARCH ?= amd64
-%-package:
-	$(MAKE) otelcol-linux_$(ARCH)
-	docker build -t otelcol-fpm internal/buildscripts/packaging/fpm
-	docker run --rm -v $(CURDIR):/repo -e PACKAGE=$* -e VERSION=$(VERSION) -e ARCH=$(ARCH) otelcol-fpm
-
-# Verify existence of READMEs for components specified as default components in the collector.
-.PHONY: checkdoc
-checkdoc:
-	checkdoc --project-path $(CURDIR) --component-rel-path $(COMP_REL_PATH) --module-name $(MOD_NAME)
 
 # Function to execute a command. Note the empty line before endef to make sure each command
 # gets executed separately instead of concatenated with previous one.
