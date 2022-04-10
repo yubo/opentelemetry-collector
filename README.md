@@ -4,11 +4,11 @@
 - [geoipprocessor](./processor/geoipprocessor)
 
 ## Installing
-```console
-$ go get github.com/yubo/opentelemetry-collector/cmd/otelcol
+```sh
+$ go install github.com/yubo/opentelemetry-collector/cmd/otelcol@latest
 ```
 
 ## Docker Build
-```console
+```sh
 $ make docker-otelcol
 ```
