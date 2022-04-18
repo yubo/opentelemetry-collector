@@ -1,0 +1,16 @@
+receivers:
+  prometheusremotewrite:
+    endpoint: "localhost:9090"
+
+processors:
+  nop:
+
+exporters:
+  nop:
+
+service:
+  pipelines:
+    metrics:
+     receivers: [prometheusremotewrite]
+     processors: [nop]
+     exporters: [nop]

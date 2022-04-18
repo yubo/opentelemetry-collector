@@ -142,6 +142,7 @@ import (
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
 
 	"github.com/yubo/opentelemetry-collector/processor/geoipprocessor"
+	"github.com/yubo/opentelemetry-collector/receiver/prometheusremotewritereceiver"
 )
 
 func Components() (component.Factories, error) {
@@ -203,6 +204,7 @@ func Components() (component.Factories, error) {
 		postgresqlreceiver.NewFactory(),
 		prometheusexecreceiver.NewFactory(),
 		prometheusreceiver.NewFactory(),
+		prometheusremotewritereceiver.NewFactory(),
 		receivercreator.NewFactory(),
 		redisreceiver.NewFactory(),
 		sapmreceiver.NewFactory(),

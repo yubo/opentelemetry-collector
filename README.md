@@ -1,7 +1,11 @@
 # Opentelemetry-collector
 
 ## Feature
-- [geoipprocessor](./processor/geoipprocessor)
+
+- receiver
+  * [prometheusremotewrite](./receiver/prometheusremotewritereceiver)
+- processor
+  * [geoip](./processor/geoipprocessor)
 
 ## Installing
 ```sh
