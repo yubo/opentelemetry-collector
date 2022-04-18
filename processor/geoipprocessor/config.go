@@ -2,6 +2,7 @@ package geoipprocessor
 
 import (
 	"net"
+	"os"
 
 	"github.com/oschwald/geoip2-golang"
 	"go.opentelemetry.io/collector/config"
@@ -48,6 +49,10 @@ func (cfg *Config) Validate() (err error) {
 	}
 	if cfg.HashPrecision <= 0 || cfg.HashPrecision > 12 {
 		cfg.HashPrecision = 12
+	}
+
+	if cfg.DatabaseFile == "" {
+		cfg.DatabaseFile = os.Getenv("GEOIP_DB_FILE")
 	}
 
 	if cfg.reader, err = geoip2.Open(cfg.DatabaseFile); err != nil {
