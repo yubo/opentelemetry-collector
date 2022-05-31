@@ -70,8 +70,14 @@ func (p *geoipProcessor) setAttr(attrs pdata.AttributeMap, record *geoip2.City) 
 				attrs.Insert(p.targetField+".city_name", pdata.NewValueString(v))
 			}
 		case "location":
-			attrs.Insert(p.targetField+".location.lat", pdata.NewValueDouble(record.Location.Latitude))
-			attrs.Insert(p.targetField+".location.lon", pdata.NewValueDouble(record.Location.Longitude))
+			mv := pdata.NewValueMap()
+			pdata.NewMapFromRaw(map[string]interface{}{
+				"lat": record.Location.Latitude,
+				"lon": record.Location.Longitude,
+			}).CopyTo(mv.MapVal())
+			attrs.Insert(p.targetField+".location", mv)
+			//attrs.Insert(p.targetField+".location.lat", pdata.NewValueDouble(record.Location.Latitude))
+			//attrs.Insert(p.targetField+".location.lon", pdata.NewValueDouble(record.Location.Longitude))
 		case "geohash":
 			attrs.Insert(p.targetField+".geohash", pdata.NewValueString(geohash.EncodeWithPrecision(
 				record.Location.Latitude,
