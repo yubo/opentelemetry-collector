@@ -1,18 +1,29 @@
 project_name: otelcol
 builds:
-  - id: "otelcol"
+  - id: otelcol
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - "386"
+      - amd64
+      - arm64
+    ignore:
+      - goos: darwin
+        goarch: "386"
+      - goos: windows
+        goarch: arm64
+    main: ./cmd/otelcol
+    binary: otelcol
     env:
       - CGO_ENABLED=0
-    goos:
-      - linux
-      #- windows
-      #- darwin
-    goarch:
-      - amd64
-      #- arm64
-    main: ./cmd/otelcol
     ldflags:
-      - -s -w -X "github.com/yubo/opentelemetry-collector/internal/version={{.Env.VERSION}}"
+      - -s
+      - -w
+      - -X "github.com/yubo/opentelemetry-collector/internal/version={{.Env.VERSION}}"
+    flags:
+      - -trimpath
 archives:
   - id: otelcol
     builds:
@@ -38,9 +49,9 @@ nfpms:
     builds:
       - otelcol
     formats:
-    - apk
-    - deb
-    - rpm
+      - apk
+      - deb
+      - rpm
     maintainer: yubo <yubo@yubo.org>
     description: OpenTelemetry Collector - otelcol
     license: Apache 2.0
