@@ -2,6 +2,8 @@ include ./Makefile.Common
 
 RUN_CONFIG?=local/config.yaml
 CMD?=
+GORELEASER ?= goreleaser
+GO ?= go
 OTEL_VERSION=main
 
 BUILD_INFO_IMPORT_PATH=github.com/yubo/opentelemetry-collector/internal/version
@@ -15,6 +17,9 @@ MOD_NAME=github.com/yubo/opentelemetry-collector
 ALL_MODULES := $(shell find . -type f -name "go.mod" -exec dirname {} \; | sort | egrep  '^./' )
 
 .DEFAULT_GOAL := all
+
+release:
+	VERSION=$(VERSION) $(GORELEASER) release --snapshot --rm-dist
 
 all-modules:
 	@echo $(ALL_MODULES) | tr ' ' '\n' | sort
@@ -54,36 +59,6 @@ for-all:
 	  (cd "$${dir}" && \
 	  	echo "running $${CMD} in $${dir}" && \
 	 	$${CMD} ); \
-	done
-
-.PHONY: add-tag
-add-tag:
-	@[ "${TAG}" ] || ( echo ">> env var TAG is not set"; exit 1 )
-	@echo "Adding tag ${TAG}"
-	@git tag -a ${TAG} -s -m "Version ${TAG}"
-	@set -e; for dir in $(ALL_MODULES); do \
-	  (echo Adding tag "$${dir:2}/$${TAG}" && \
-	 	git tag -a "$${dir:2}/$${TAG}" -s -m "Version ${dir:2}/${TAG}" ); \
-	done
-
-.PHONY: push-tag
-push-tag:
-	@[ "${TAG}" ] || ( echo ">> env var TAG is not set"; exit 1 )
-	@echo "Pushing tag ${TAG}"
-	@git push upstream ${TAG}
-	@set -e; for dir in $(ALL_MODULES); do \
-	  (echo Pushing tag "$${dir:2}/$${TAG}" && \
-	 	git push upstream "$${dir:2}/$${TAG}"); \
-	done
-
-.PHONY: delete-tag
-delete-tag:
-	@[ "${TAG}" ] || ( echo ">> env var TAG is not set"; exit 1 )
-	@echo "Deleting tag ${TAG}"
-	@git tag -d ${TAG}
-	@set -e; for dir in $(ALL_MODULES); do \
-	  (echo Deleting tag "$${dir:2}/$${TAG}" && \
-	 	git tag -d "$${dir:2}/$${TAG}" ); \
 	done
 
 DEPENDABOT_PATH=".github/dependabot.yml"
@@ -238,3 +213,38 @@ multimod-verify: install-tools
 .PHONY: multimod-prerelease
 multimod-prerelease: install-tools
 	multimod prerelease -v ./versions.yaml -m contrib-base
+
+goreleaser-verify: goreleaser
+	@${GORELEASER} release --snapshot --rm-dist
+
+
+.PHONY: go
+go:
+	@{ \
+		if ! command -v '$(GO)' >/dev/null 2>/dev/null; then \
+			echo >&2 '$(GO) command not found. Please install golang. https://go.dev/doc/install'; \
+			exit 1; \
+		fi \
+	}
+
+.PHONY: goreleaser
+goreleaser:
+	@{ \
+		if ! command -v '$(GORELEASER)' >/dev/null 2>/dev/null; then \
+			echo >&2 '$(GORELEASER) command not found. Please install goreleaser. https://goreleaser.com/install/'; \
+			exit 1; \
+		fi \
+	}
+
+.PHONY: add-tag
+add-tag:
+	@[ "${TAG}" ] || ( echo ">> env var TAG is not set"; exit 1 )
+	@echo "Adding tag ${TAG}"
+	@git tag -a ${TAG} -s -m "Version ${TAG}"
+
+.PHONY: push-tag
+push-tag:
+	@[ "${TAG}" ] || ( echo ">> env var TAG is not set"; exit 1 )
+	@echo "Pushing tag ${TAG}"
+	@git push git@github.com:yubo/opentelemetry-collector.git ${TAG}
+

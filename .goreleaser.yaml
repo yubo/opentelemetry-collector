@@ -1,0 +1,82 @@
+project_name: otelcol
+builds:
+  - id: "otelcol"
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      #- windows
+      #- darwin
+    goarch:
+      - amd64
+      #- arm64
+    main: ./cmd/otelcol
+    ldflags:
+      - -s -w -X "github.com/yubo/opentelemetry-collector/internal/version={{.Env.VERSION}}"
+archives:
+  - id: otelcol
+    builds:
+      - otelcol
+    name_template: '{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{
+      .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}'
+nfpms:
+  - package_name: otelcol
+    contents:
+      - src: distributions/otelcol/otelcol.service
+        dst: /lib/systemd/system/otelcol.service
+      - src: distributions/otelcol/otelcol.conf
+        dst: /etc/otelcol/otelcol.conf
+        type: config|noreplace
+      - src: configs/otelcol.yaml
+        dst: /etc/otelcol/config.yaml
+        type: config
+    scripts:
+      preinstall: distributions/otelcol/preinstall.sh
+      postinstall: distributions/otelcol/postinstall.sh
+      preremove: distributions/otelcol/preremove.sh
+    id: otelcol
+    builds:
+      - otelcol
+    formats:
+    - apk
+    - deb
+    - rpm
+    maintainer: yubo <yubo@yubo.org>
+    description: OpenTelemetry Collector - otelcol
+    license: Apache 2.0
+
+checksum:
+  name_template: 'checksums.txt'
+
+
+dockers:
+- id: otelcol
+  goos: linux
+  goarch: amd64
+  dockerfile: distributions/otelcol/Dockerfile
+  image_templates:
+  - ybbbbasdf/otelcol:{{ .Version }}-amd64
+  extra_files:
+  - configs/otelcol.yaml
+  build_flag_templates:
+  - --pull
+  - --platform=linux/amd64
+  - --label=image.created={{.Date}}
+  - --label=image.name={{.ProjectName}}
+  - --label=image.revision={{.FullCommit}}
+  - --label=image.version={{.Version}}
+  - --label=image.source={{.GitURL}}
+  use: buildx
+
+docker_manifests:
+- name_template: ybbbbasdf/otelcol:{{ .Version }}
+  image_templates:
+  - ybbbbasdf/otelcol:{{ .Version }}-amd64
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'

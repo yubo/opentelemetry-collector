@@ -36,3 +36,5 @@ integration-coverage.html
 # Wix
 *.wixobj
 *.wixpdb
+
+dist/
